@@ -28,6 +28,11 @@ poetry run pre-commit install
 poetry run python -m llm_etl_eval --help
 ```
 
+**ETL Run**
+```bash
+poetry run python -m llm_etl_eval.etl.run --input-dir data/raw --output-dir data/processed
+```
+
 **Common Commands**
 ```bash
 make lint

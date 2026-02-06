@@ -7,7 +7,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-import jsonschema
 from jsonschema import Draft202012Validator
 
 RAW_DIR = Path("data/raw")
