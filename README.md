@@ -48,6 +48,11 @@ poetry run python -m llm_etl_eval.transform.run --schema data/expected/target_sc
 poetry run python -m llm_etl_eval.eval.run --inputs data/processed/llm_inputs.jsonl --outputs data/llm/outputs.jsonl --gold data/gold/labels.jsonl --schema data/expected/target_schema.json --out reports/
 ```
 
+**Monitoring Checks**
+```bash
+poetry run python -m llm_etl_eval.checks.run --baseline reports/example/report.json --current reports/latest/report.json
+```
+
 **Common Commands**
 ```bash
 make lint

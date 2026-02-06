@@ -1,0 +1,14 @@
+{
+  "schema_validity_rate": 0.48,
+  "completeness_rate": 0.78,
+  "field_accuracy": 0.5,
+  "constraint_violations_per_record": 0.6,
+  "consistency_rate": 1.0,
+  "error_taxonomy": {
+    "'critical' is not one of ['low', 'high', 'urgent', 'medium']": 2
+  },
+  "totals": {
+    "records": 10,
+    "gold_records": 2
+  }
+}
