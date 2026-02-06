@@ -1,0 +1,13 @@
+ticket_id,customer_id,created_at,category,priority,summary,language,metadata
+TKT-1000,CUST-202,2025-11-10T14:30:00+00:00,Billing,MEDIUM,,,"{""source"": ""web"", ""tags"": [""vip""], ""browser"": ""Chrome"", ""ticket_version"": 1}"
+TKT-1001,CUST-219,2025-11-10T20:30:00+00:00,product,high,Cannot reset password using email link,es,"{""source"": ""email"", ""tags"": [""standard""], ""browser"": ""Firefox"", ""ticket_version"": 2}"
+TKT-1002,CUST-236,2025-11-11T02:30:00+00:00,shipping,urgent,Login fails after update,de,"{""source"": ""web"", ""tags"": [""standard""], ""browser"": ""Firefox"", ""ticket_version"": 1}"
+TKT-1003,CUST-203,2025-11-11T08:30:00+00:00,Security,low,Package arrived damaged,en,"{""source"": ""email"", ""tags"": [""standard""], ""browser"": ""Chrome"", ""ticket_version"": 2}"
+TKT-1004,CUST-220,2025-11-11T14:30:00+00:00,technical,MEDIUM,Suspicious login detected,fr,"{""source"": ""web"", ""tags"": [""vip""], ""browser"": ""Firefox"", ""ticket_version"": 1}"
+TKT-1005,CUST-237,2025-11-11T20:30:00+00:00,account,high,Feature request: bulk export,,"{""source"": ""email"", ""tags"": [""standard""], ""browser"": ""Firefox"", ""ticket_version"": 2}"
+TKT-1006,CUST-204,2025-11-12T02:30:00+00:00,Billing,urgent,Payment failed but card was charged,es,"{""source"": ""web"", ""tags"": [""standard""], ""browser"": ""Chrome"", ""ticket_version"": 1}"
+TKT-1007,CUST-221,2025-11-12T08:30:00+00:00,product,low,,de,"{""source"": ""email"", ""tags"": [""standard""], ""browser"": ""Firefox"", ""ticket_version"": 2}"
+TKT-1008,CUST-238,2025-11-12T14:30:00+00:00,shipping,MEDIUM,App crashes on launch,en,"{""source"": ""web"", ""tags"": [""vip""], ""browser"": ""Firefox"", ""ticket_version"": 1}"
+TKT-1009,CUST-205,2025-11-12T20:30:00+00:00,Security,high,Account locked after too many attempts,fr,"{""source"": ""email"", ""tags"": [""standard""], ""browser"": ""Chrome"", ""ticket_version"": 2}"
+TKT-1010,CUST-999,11/12/2025 09:15,tech support,med,Latency spikes in EU region,en-US,"{""source"": ""chat"", ""tags"": [""sla""], ""region"": ""EU""}"
+TKT-1011,CUST-420,2025-11-13T07:20:00Z,Billing,High,Refund requested for duplicate charge,EN,"{""source"": ""phone"", ""tags"": [""refund""], ""agent_id"": ""AG-7""}"

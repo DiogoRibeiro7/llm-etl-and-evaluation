@@ -2,6 +2,17 @@
 
 Professional, typed Python tooling for LLM ETL and evaluation workflows.
 
+**Scenario**
+Messy support tickets and incident events arrive in CSV + JSONL with inconsistent categories, missing fields, and mixed timestamp formats. The pipeline normalizes the data, builds an LLM prompt payload, then validates and evaluates model outputs against a strict target JSON schema for downstream systems.
+
+**Demo Data**
+- Raw tickets: `data/raw/tickets.csv`
+- Raw events: `data/raw/events.jsonl`
+- Expected schema: `data/expected/target_schema.json`
+- Generator: `scripts/generate_demo_data.py` (deterministic seed)
+- Validator: `scripts/validate_demo_data.py` (validates normalized LLM outputs)
+  - Expects `data/raw/llm_outputs.jsonl` containing one normalized JSON object per line.
+
 **Requirements**
 - Python 3.11+
 - Poetry
@@ -24,6 +35,8 @@ make format
 make typecheck
 make test
 make ci
+make demo-data
+make validate-demo
 ```
 
 **CI**
