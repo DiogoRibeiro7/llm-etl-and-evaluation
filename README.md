@@ -33,6 +33,16 @@ poetry run python -m llm_etl_eval --help
 poetry run python -m llm_etl_eval.etl.run --input-dir data/raw --output-dir data/processed
 ```
 
+**LLM Simulator**
+```bash
+poetry run python -m llm_etl_eval.sim.run --inputs data/processed/llm_inputs.jsonl --outputs data/llm/outputs.jsonl --error-rate 0.2
+```
+
+**Transform to Target System**
+```bash
+poetry run python -m llm_etl_eval.transform.run --schema data/expected/target_schema.json --llm-outputs data/llm/outputs.jsonl --out-dir data/final
+```
+
 **Common Commands**
 ```bash
 make lint
