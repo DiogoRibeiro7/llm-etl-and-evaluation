@@ -20,4 +20,5 @@ demo-data:
 	$(POETRY) run python scripts/generate_demo_data.py
 
 validate-demo:
+	$(POETRY) run python -m llm_etl_eval.etl.run --input-dir data/raw --output-dir data/processed
 	$(POETRY) run python scripts/validate_demo_data.py
