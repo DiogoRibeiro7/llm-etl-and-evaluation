@@ -8,8 +8,7 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
-from jsonschema import Draft202012Validator
-
+from llm_etl_eval.eval.schema_validate import SchemaIssue, validate_schema
 from llm_etl_eval.transform.errors import TransformError
 from llm_etl_eval.transform.map import map_payload
 from llm_etl_eval.transform.parse import parse_json
@@ -45,16 +44,16 @@ def _write_rejected(records: list[dict[str, Any]], path: Path) -> None:
 def _validate_schema(payload: dict[str, Any], schema: dict[str, Any]) -> list[TransformError]:
     """Validate payload against schema and capture errors."""
 
-    validator = Draft202012Validator(schema)
     errors: list[TransformError] = []
-    for error in validator.iter_errors(payload):
-        field_path = ".".join(str(part) for part in error.path) if error.path else None
+    issues = validate_schema(payload, schema)
+    for issue in issues:
         errors.append(
             TransformError(
-                code="schema_violation",
-                message=error.message,
-                field_path=field_path,
-                severity="error",
+                code=issue.code,
+                message=issue.message,
+                field_path=issue.field_path,
+                severity=issue.severity,
+                raw_value=issue.raw_value,
             )
         )
     return errors

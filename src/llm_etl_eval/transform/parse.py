@@ -46,6 +46,7 @@ def parse_json(text: str) -> tuple[dict[str, Any] | None, list[TransformError]]:
                 message=f"Failed to parse JSON: {exc}",
                 field_path=None,
                 severity="error",
+                raw_value=text,
             )
         )
         return None, errors
@@ -57,6 +58,7 @@ def parse_json(text: str) -> tuple[dict[str, Any] | None, list[TransformError]]:
                 message="Parsed JSON is not an object.",
                 field_path=None,
                 severity="error",
+                raw_value=parsed,
             )
         )
         return None, errors

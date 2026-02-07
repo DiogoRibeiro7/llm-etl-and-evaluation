@@ -20,6 +20,7 @@ def coerce_list(value: Any, field_path: str, errors: list[TransformError]) -> li
             message=f"Coerced {field_path} into a list.",
             field_path=field_path,
             severity="warning",
+            raw_value=value,
         )
     )
     return [value]
@@ -38,6 +39,7 @@ def coerce_string(value: Any, field_path: str, errors: list[TransformError]) -> 
             message=f"Coerced {field_path} into a string.",
             field_path=field_path,
             severity="warning",
+            raw_value=value,
         )
     )
     return str(value)
@@ -56,6 +58,7 @@ def coerce_float(value: Any, field_path: str, errors: list[TransformError]) -> f
             message=f"Coerced {field_path} into a float.",
             field_path=field_path,
             severity="warning",
+            raw_value=value,
         )
     )
     try:

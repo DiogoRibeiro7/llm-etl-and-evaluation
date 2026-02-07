@@ -31,6 +31,7 @@ def _validate_required(payload: dict[str, Any], errors: list[TransformError]) ->
                     message=f"Missing required field: {field}",
                     field_path=field,
                     severity="error",
+                    raw_value=None,
                 )
             )
 
@@ -46,6 +47,7 @@ def _map_entities(value: Any, errors: list[TransformError]) -> list[dict[str, An
                     message="Entity must be an object.",
                     field_path=f"entities[{idx}]",
                     severity="error",
+                    raw_value=entity,
                 )
             )
             continue
@@ -74,6 +76,7 @@ def _map_actions(value: Any, errors: list[TransformError]) -> list[dict[str, Any
                     message="Action must be an object.",
                     field_path=f"actions[{idx}]",
                     severity="error",
+                    raw_value=action,
                 )
             )
             continue
