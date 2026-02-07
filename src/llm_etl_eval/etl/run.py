@@ -21,7 +21,7 @@ def _write_jsonl(records: list[dict[str, Any]], path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as handle:
         for record in records:
-            handle.write(json.dumps(record) + "\n")
+            handle.write(json.dumps(record, sort_keys=True) + "\n")
 
 
 def _write_parquet(records: list[dict[str, Any]], path: Path) -> None:

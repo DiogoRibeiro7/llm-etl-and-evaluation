@@ -84,5 +84,69 @@ def test_metrics_basic(tmp_path: Path) -> None:
     assert result.totals["records"] == 2
     assert result.schema_validity_rate == 0.5
     assert result.completeness_rate < 1.0
-    assert result.field_accuracy == 0.25
+    assert result.field_accuracy == 2 / 3
+    assert result.field_accuracy_breakdown["category"] == 0.5
+    assert result.field_accuracy_breakdown["priority"] == 0.5
     assert result.constraint_violations_per_record > 0
+
+
+def test_summary_similarity_metric(tmp_path: Path) -> None:
+    outputs = [
+        {
+            "ticket_id": "TKT-9",
+            "customer_id": "C-9",
+            "created_at": "2025-11-10T14:30:00+00:00",
+            "language": "en",
+            "summary": "reset password failing",
+            "category": "billing",
+            "priority": "high",
+            "entities": [],
+            "actions": [{"action": "triage", "owner": "AG-1", "due_at": "2025-11-11T00:00:00+00:00"}],
+        }
+    ]
+
+    gold = [
+        {
+            "ticket_id": "TKT-9",
+            "customer_id": "C-9",
+            "category": "billing",
+            "priority": "high",
+            "summary": "password reset failing",
+        }
+    ]
+
+    schema = {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "required": [
+            "ticket_id",
+            "customer_id",
+            "created_at",
+            "language",
+            "summary",
+            "category",
+            "priority",
+            "entities",
+            "actions",
+        ],
+        "properties": {
+            "ticket_id": {"type": "string"},
+            "customer_id": {"type": "string"},
+            "created_at": {"type": "string"},
+            "language": {"type": "string"},
+            "summary": {"type": "string"},
+            "category": {"type": "string"},
+            "priority": {"type": "string"},
+            "entities": {"type": "array"},
+            "actions": {"type": "array"},
+        },
+    }
+
+    outputs_path = tmp_path / "outputs.jsonl"
+    gold_path = tmp_path / "gold.jsonl"
+
+    _write_jsonl(outputs_path, outputs)
+    _write_jsonl(gold_path, gold)
+
+    result = compute_metrics(str(outputs_path), str(gold_path), schema)
+    assert result.field_accuracy_breakdown["summary"] == 1.0

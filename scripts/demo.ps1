@@ -1,6 +1,6 @@
 # Demo: ETL -> LLM outputs (simulated) -> Transform/Validate -> Evaluate -> Improve
 # Usage:
-#   powershell -ExecutionPolicy Bypass -File .\scripts\demo_interview.ps1
+#   powershell -ExecutionPolicy Bypass -File .\scripts\demo.ps1
 
 $ErrorActionPreference = "Stop"
 
@@ -42,6 +42,7 @@ Step "[4/6] Evaluate BASELINE (metrics + error taxonomy)"
 poetry run python -m llm_etl_eval.eval.run `
   --inputs data/processed/llm_inputs.jsonl `
   --outputs data/llm/outputs_baseline.jsonl `
+  --gold data/gold/labels.jsonl `
   --schema data/expected/target_schema.json `
   --out reports/baseline | Out-Host
 
@@ -61,6 +62,7 @@ poetry run python -m llm_etl_eval.transform.run `
 poetry run python -m llm_etl_eval.eval.run `
   --inputs data/processed/llm_inputs.jsonl `
   --outputs data/llm/outputs_improved.jsonl `
+  --gold data/gold/labels.jsonl `
   --schema data/expected/target_schema.json `
   --out reports/improved | Out-Host
 

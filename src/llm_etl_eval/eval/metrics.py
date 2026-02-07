@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from collections import Counter, defaultdict
 from dataclasses import dataclass
 from typing import Any
@@ -32,6 +33,7 @@ class MetricResult:
     schema_validity_rate: float
     completeness_rate: float
     field_accuracy: float
+    field_accuracy_breakdown: dict[str, float]
     constraint_violations_per_record: float
     consistency_rate: float
     error_taxonomy: dict[str, int]
@@ -100,24 +102,54 @@ def _compute_schema_validity(
 
 def _compute_field_accuracy(
     records: list[dict[str, Any]], gold: dict[str, dict[str, Any]]
-) -> float:
+) -> tuple[float, dict[str, float]]:
     if not gold:
-        return 0.0
+        return 0.0, {}
 
-    correct = 0
-    total = 0
+    fields = ["ticket_id", "customer_id", "category", "priority", "summary"]
+    correct = {field: 0 for field in fields}
+    total = {field: 0 for field in fields}
+
     for record in records:
         ticket_id = str(record.get("ticket_id", ""))
         if ticket_id not in gold:
             continue
         expected = gold[ticket_id]
-        for field, expected_value in expected.items():
-            if field == "ticket_id":
+        for field in fields:
+            if field not in expected:
                 continue
-            total += 1
-            if record.get(field) == expected_value:
-                correct += 1
-    return correct / total if total else 0.0
+            expected_value = expected.get(field)
+            total[field] += 1
+            if field == "summary":
+                if _summary_similarity(record.get(field), expected_value) >= 0.6:
+                    correct[field] += 1
+            else:
+                if record.get(field) == expected_value:
+                    correct[field] += 1
+
+    total_count = sum(total.values())
+    correct_count = sum(correct.values())
+    overall = correct_count / total_count if total_count else 0.0
+    breakdown = {
+        field: (correct[field] / total[field] if total[field] else 0.0) for field in fields
+    }
+    return overall, breakdown
+
+
+def _summary_similarity(value: Any, expected: Any) -> float:
+    if not isinstance(value, str) or not isinstance(expected, str):
+        return 0.0
+    tokens_a = _tokenize(value)
+    tokens_b = _tokenize(expected)
+    if not tokens_a or not tokens_b:
+        return 0.0
+    intersection = tokens_a.intersection(tokens_b)
+    union = tokens_a.union(tokens_b)
+    return len(intersection) / len(union) if union else 0.0
+
+
+def _tokenize(text: str) -> set[str]:
+    return set(re.findall(r"[a-z0-9]+", text.lower()))
 
 
 def _compute_constraint_violations(records: list[dict[str, Any]]) -> float:
@@ -173,7 +205,8 @@ def _build_error_taxonomy(schema_issues: list[list[SchemaIssue]]) -> dict[str, i
     for record_issues in schema_issues:
         for issue in record_issues:
             counter[issue.message] += 1
-    return dict(counter.most_common())
+    sorted_items = sorted(counter.items(), key=lambda item: (-item[1], item[0]))
+    return dict(sorted_items)
 
 
 def compute_metrics(
@@ -186,7 +219,7 @@ def compute_metrics(
 
     schema_validity_rate, schema_issues = _compute_schema_validity(records, schema)
     completeness_rate = _compute_completeness(records)
-    field_accuracy = _compute_field_accuracy(records, gold)
+    field_accuracy, field_accuracy_breakdown = _compute_field_accuracy(records, gold)
     constraint_violations = _compute_constraint_violations(records)
     consistency_rate = _compute_consistency(records)
     error_taxonomy = _build_error_taxonomy(schema_issues)
@@ -200,6 +233,7 @@ def compute_metrics(
         schema_validity_rate=schema_validity_rate,
         completeness_rate=completeness_rate,
         field_accuracy=field_accuracy,
+        field_accuracy_breakdown=field_accuracy_breakdown,
         constraint_violations_per_record=constraint_violations,
         consistency_rate=consistency_rate,
         error_taxonomy=error_taxonomy,

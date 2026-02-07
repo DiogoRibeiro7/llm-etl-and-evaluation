@@ -162,7 +162,7 @@ def main(argv: list[str] | None = None) -> int:
     results = run_checks(args.baseline, args.current, args.inputs, args.baseline_inputs)
 
     for result in results:
-        print(json.dumps(asdict(result)))
+        print(json.dumps(asdict(result), sort_keys=True))
 
     if any(not result.ok for result in results):
         return 1

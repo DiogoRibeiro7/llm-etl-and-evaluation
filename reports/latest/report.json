@@ -1,14 +1,21 @@
 {
-  "schema_validity_rate": 0.48,
   "completeness_rate": 0.78,
-  "field_accuracy": 0.5,
-  "constraint_violations_per_record": 0.6,
   "consistency_rate": 1.0,
+  "constraint_violations_per_record": 0.6,
   "error_taxonomy": {
     "'critical' is not one of ['low', 'high', 'urgent', 'medium']": 2
   },
+  "field_accuracy": 0.55,
+  "field_accuracy_breakdown": {
+    "category": 0.4,
+    "customer_id": 0.7,
+    "priority": 0.4,
+    "summary": 0.6,
+    "ticket_id": 0.7
+  },
+  "schema_validity_rate": 0.48,
   "totals": {
-    "records": 10,
-    "gold_records": 2
+    "gold_records": 50,
+    "records": 10
   }
 }

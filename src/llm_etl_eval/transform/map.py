@@ -7,7 +7,7 @@ from typing import Any
 from llm_etl_eval.transform.coerce import coerce_float, coerce_list, coerce_string
 from llm_etl_eval.transform.errors import TransformError
 
-REQUIRED_FIELDS = {
+REQUIRED_FIELDS = [
     "ticket_id",
     "customer_id",
     "created_at",
@@ -17,7 +17,7 @@ REQUIRED_FIELDS = {
     "priority",
     "entities",
     "actions",
-}
+]
 
 
 def _validate_required(payload: dict[str, Any], errors: list[TransformError]) -> None:

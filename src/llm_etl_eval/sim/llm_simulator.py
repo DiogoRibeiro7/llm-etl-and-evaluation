@@ -122,4 +122,4 @@ def write_outputs(results: Iterable[SimulationResult], path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as handle:
         for result in results:
-            handle.write(json.dumps(result.output) + "\n")
+            handle.write(json.dumps(result.output, sort_keys=True) + "\n")

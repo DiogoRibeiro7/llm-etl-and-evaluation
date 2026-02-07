@@ -8,6 +8,7 @@ packages = [{ include = "llm_etl_eval", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.11"
+jsonschema = "^4.23.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.6.3"
@@ -15,7 +16,6 @@ mypy = "^1.11.2"
 pytest = "^8.3.2"
 pytest-cov = "^5.0.0"
 pre-commit = "^3.8.0"
-jsonschema = "^4.23.0"
 
 [build-system]
 requires = ["poetry-core>=1.9.0"]
