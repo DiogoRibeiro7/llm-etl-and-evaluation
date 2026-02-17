@@ -1,0 +1,7 @@
+coercion:
+  enabled: false
+parsing:
+  strict: false
+prompt:
+  strictness: minimal
+  schema_reminders: false

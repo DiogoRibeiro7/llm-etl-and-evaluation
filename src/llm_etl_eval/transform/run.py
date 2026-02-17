@@ -8,6 +8,12 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
+from llm_etl_eval.config import PipelineConfig, load_config
+from llm_etl_eval.contracts import (
+    ContractError,
+    parse_llm_output_record,
+    parse_target_system_record,
+)
 from llm_etl_eval.eval.schema_validate import SchemaIssue, validate_schema
 from llm_etl_eval.transform.errors import TransformError
 from llm_etl_eval.transform.map import map_payload
@@ -59,11 +65,36 @@ def _validate_schema(payload: dict[str, Any], schema: dict[str, Any]) -> list[Tr
     return errors
 
 
-def run_transform(schema_path: Path, llm_outputs_path: Path, out_dir: Path) -> None:
+def _contract_errors_to_transform(errors: list[ContractError]) -> list[TransformError]:
+    return [
+        TransformError(
+            code=error.code,
+            message=error.message,
+            field_path=error.field_path,
+            severity="error",
+            raw_value=error.raw_value,
+        )
+        for error in errors
+    ]
+
+
+def _load_config(path: Path | None) -> PipelineConfig:
+    if path is None:
+        return PipelineConfig()
+    return load_config(path)
+
+
+def run_transform(
+    schema_path: Path,
+    llm_outputs_path: Path,
+    out_dir: Path,
+    config_path: Path | None = None,
+) -> None:
     """Run the transformation pipeline."""
 
     schema = _load_schema(schema_path)
     lines = _load_lines(llm_outputs_path)
+    config = _load_config(config_path)
 
     accepted: list[dict[str, Any]] = []
     rejected: list[dict[str, Any]] = []
@@ -72,7 +103,7 @@ def run_transform(schema_path: Path, llm_outputs_path: Path, out_dir: Path) -> N
         if not line.strip():
             continue
 
-        parsed, parse_errors = parse_json(line)
+        parsed, parse_errors = parse_json(line, strict=config.strict_parsing)
         if parsed is None:
             rejected.append(
                 {
@@ -82,9 +113,33 @@ def run_transform(schema_path: Path, llm_outputs_path: Path, out_dir: Path) -> N
             )
             continue
 
-        mapped, map_errors = map_payload(parsed)
+        _, llm_contract_errors = parse_llm_output_record(parsed)
+        errors = parse_errors + _contract_errors_to_transform(llm_contract_errors)
+
+        if any(error.severity == "error" for error in errors):
+            rejected.append(
+                {
+                    "record": parsed,
+                    "errors": [asdict(error) for error in errors],
+                }
+            )
+            continue
+
+        mapped, map_errors = map_payload(parsed, allow_coercion=config.coercion_enabled)
+        _, contract_errors = parse_target_system_record(mapped)
+        errors = errors + map_errors + _contract_errors_to_transform(contract_errors)
+
+        if any(error.severity == "error" for error in errors):
+            rejected.append(
+                {
+                    "record": mapped,
+                    "errors": [asdict(error) for error in errors],
+                }
+            )
+            continue
+
         schema_errors = _validate_schema(mapped, schema)
-        errors = parse_errors + map_errors + schema_errors
+        errors = errors + schema_errors
 
         if any(error.severity == "error" for error in errors):
             rejected.append(
@@ -121,6 +176,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Path to LLM outputs JSONL.",
     )
     parser.add_argument(
+        "--config",
+        type=Path,
+        required=False,
+        help="Optional pipeline config (YAML/JSON) for parsing/coercion.",
+    )
+    parser.add_argument(
         "--out-dir",
         type=Path,
         required=True,
@@ -134,7 +195,7 @@ def main(argv: list[str] | None = None) -> int:
 
     parser = build_parser()
     args = parser.parse_args(argv)
-    run_transform(args.schema, args.llm_outputs, args.out_dir)
+    run_transform(args.schema, args.llm_outputs, args.out_dir, args.config)
     return 0
 
 

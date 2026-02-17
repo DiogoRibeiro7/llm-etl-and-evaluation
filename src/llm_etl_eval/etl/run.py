@@ -9,6 +9,7 @@ from pathlib import Path
 import importlib.util
 from typing import Any
 
+from llm_etl_eval.contracts import parse_canonical_input_record
 from llm_etl_eval.etl.clean import clean_all
 from llm_etl_eval.etl.ingest import IngestConfig, load_raw
 from llm_etl_eval.etl.join import join_by_ticket
@@ -39,6 +40,24 @@ def _write_parquet(records: list[dict[str, Any]], path: Path) -> None:
     pq.write_table(table, path)
 
 
+def _validate_canonical_inputs(records: list[dict[str, Any]]) -> None:
+    failures: list[dict[str, Any]] = []
+    for index, record in enumerate(records):
+        _, errors = parse_canonical_input_record(record)
+        if errors:
+            failures.append(
+                {
+                    "index": index,
+                    "errors": [asdict(error) for error in errors],
+                }
+            )
+    if failures:
+        raise ValueError(
+            "CanonicalInputRecord validation failed for "
+            f"{len(failures)} record(s): {failures[:3]}"
+        )
+
+
 def run_pipeline(input_dir: Path, output_dir: Path) -> None:
     """Run the ETL pipeline from raw inputs to normalized outputs."""
 
@@ -53,6 +72,7 @@ def run_pipeline(input_dir: Path, output_dir: Path) -> None:
     normalized = normalize_all(joined)
 
     records = [asdict(record) for record in normalized]
+    _validate_canonical_inputs(records)
 
     _write_jsonl(records, output_dir / "llm_inputs.jsonl")
     _write_parquet(records, output_dir / "records.parquet")

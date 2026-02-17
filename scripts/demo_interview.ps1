@@ -33,56 +33,87 @@ function Top-Errors([object]$report) {
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
 Set-Location $repoRoot
+$errorRate = 0.35
+$baselineConfig = "configs/baseline.yaml"
+$improvedConfig = "configs/improved.yaml"
+$schemaPath = "data/expected/target_schema.json"
 
 Step "Demo: llm-etl-and-evaluation (interview run)"
 
-Step "[0/6] Install dependencies"
+Step "[0/9] Install dependencies"
 poetry install --no-interaction | Out-Host
 
-Step "[1/6] Run ETL (raw -> processed)"
+Step "[1/9] Run ETL (raw -> processed)"
 poetry run python -m llm_etl_eval.etl.run `
   --input-dir data/raw `
   --output-dir data/processed | Out-Host
 
-Step "[2/6] Generate BASELINE LLM outputs (simulated errors)"
+Step "[2/9] Generate BASELINE prompts (config-driven)"
+poetry run python -m llm_etl_eval.prompting.run `
+  --inputs data/processed/llm_inputs.jsonl `
+  --schema $schemaPath `
+  --config $baselineConfig `
+  --out data/llm/prompts_baseline.jsonl | Out-Host
+
+Step "[3/9] Generate BASELINE LLM outputs (simulated errors)"
 poetry run python -m llm_etl_eval.sim.run `
   --inputs data/processed/llm_inputs.jsonl `
   --outputs data/llm/outputs_baseline.jsonl `
-  --error-rate 0.35 `
+  --error-rate $errorRate `
   --seed 7 | Out-Host
 
-Step "[3/6] Transform + validate BASELINE outputs"
+Step "[4/9] Transform + validate BASELINE outputs"
 poetry run python -m llm_etl_eval.transform.run `
-  --schema data/expected/target_schema.json `
+  --schema $schemaPath `
   --llm-outputs data/llm/outputs_baseline.jsonl `
+  --config $baselineConfig `
   --out-dir data/final/baseline | Out-Host
 
-Step "[4/6] Evaluate BASELINE (metrics + error taxonomy)"
+Step "[5/9] Round-trip BASELINE accepted outputs"
+poetry run python -m llm_etl_eval.checks.roundtrip `
+  --accepted data/final/baseline/accepted.jsonl `
+  --schema $schemaPath `
+  --out data/final/baseline/api_payloads.jsonl | Out-Host
+
+Step "[6/9] Evaluate BASELINE (metrics + error taxonomy)"
 poetry run python -m llm_etl_eval.eval.run `
   --inputs data/processed/llm_inputs.jsonl `
   --outputs data/llm/outputs_baseline.jsonl `
   --gold data/gold/labels.jsonl `
-  --schema data/expected/target_schema.json `
+  --schema $schemaPath `
   --out reports/baseline | Out-Host
 
-Step "[5/6] Generate IMPROVED LLM outputs (fewer errors)"
+Step "[7/9] Generate IMPROVED prompts (config-driven)"
+poetry run python -m llm_etl_eval.prompting.run `
+  --inputs data/processed/llm_inputs.jsonl `
+  --schema $schemaPath `
+  --config $improvedConfig `
+  --out data/llm/prompts_improved.jsonl | Out-Host
+
+Step "[8/9] Generate IMPROVED LLM outputs (same error rate)"
 poetry run python -m llm_etl_eval.sim.run `
   --inputs data/processed/llm_inputs.jsonl `
   --outputs data/llm/outputs_improved.jsonl `
-  --error-rate 0.15 `
+  --error-rate $errorRate `
   --seed 7 | Out-Host
 
-Step "[6/6] Transform + validate + evaluate IMPROVED outputs"
+Step "[9/9] Transform + validate + evaluate IMPROVED outputs"
 poetry run python -m llm_etl_eval.transform.run `
-  --schema data/expected/target_schema.json `
+  --schema $schemaPath `
   --llm-outputs data/llm/outputs_improved.jsonl `
+  --config $improvedConfig `
   --out-dir data/final/improved | Out-Host
+
+poetry run python -m llm_etl_eval.checks.roundtrip `
+  --accepted data/final/improved/accepted.jsonl `
+  --schema $schemaPath `
+  --out data/final/improved/api_payloads.jsonl | Out-Host
 
 poetry run python -m llm_etl_eval.eval.run `
   --inputs data/processed/llm_inputs.jsonl `
   --outputs data/llm/outputs_improved.jsonl `
   --gold data/gold/labels.jsonl `
-  --schema data/expected/target_schema.json `
+  --schema $schemaPath `
   --out reports/improved | Out-Host
 
 $baselineMd = Join-Path $repoRoot "reports/baseline/report.md"

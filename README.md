@@ -1,67 +1,83 @@
-# LLM ETL & Evaluation — Candidate Artifact
+# LLM ETL & Evaluation — Interview Pitch
 
-This repo demonstrates a production‑minded pipeline for normalizing messy operational data, producing LLM‑ready inputs, simulating and validating LLM outputs, and integrating them into a strict downstream system with evaluation and monitoring. It is designed to show how I build reliable data/LLM systems: typed contracts, deterministic ETL, robust parsing, and measurable quality.
+This repo is a compact, production-minded LLM data pipeline that treats model output as untrusted input and proves downstream compatibility. It showcases how I design data semantics, enforce contracts, transform messy LLM output into safe records, and measure quality with meaningful success metrics.
 
-## System Flow
+**Pipeline Diagram**
 
 ```
 Raw Data (CSV/JSONL)
         |
         v
-      ETL
+  Ingest + Clean
         |
         v
-   LLM Inputs  ---> (simulate / real) --->  LLM Outputs
-        |                                      |
-        v                                      v
-   Transform -----------------------------> Target System
-        ^                                      |
-        |                                      v
-        +-------------- Eval / Monitoring <----+
+ Canonical Inputs  --->  Prompting (strictness knobs)
+        |                               |
+        v                               v
+     Simulator / LLM  ----------------> LLM Outputs
+        |                               |
+        v                               v
+ Parse + Coerce + Map  --->  Accepted / Rejected
+        |                               |
+        v                               v
+  Round-trip Check  ----------------> Target API Payloads
+        |
+        v
+ Evaluation + Monitoring
 ```
 
-## Quickstart
+**What This Demonstrates**
+
+- Data semantics: stable canonical input record with deterministic normalization rules and explicit fallbacks.
+- Schemas/contracts: JSON Schema gates downstream shape, plus typed contracts at ETL and transform boundaries.
+- Transformation logic: tolerant parsing, explicit coercion rules, and structured error taxonomy (no silent guessing).
+- Evaluation strategy + success metrics: schema validity rate, completeness, field accuracy vs. gold, constraints per record, and consistency.
+
+**Run the Interview Demo on Windows (3 commands max)**
+
+```powershell
+poetry install
+powershell -ExecutionPolicy Bypass -File .\scripts\demo_interview.ps1
+```
+
+**Run the Interview Demo on macOS/Linux**
 
 ```bash
 poetry install
-poetry run python -m llm_etl_eval.etl.run --input-dir data/raw --output-dir data/processed
-poetry run python -m llm_etl_eval.sim.run --inputs data/processed/llm_inputs.jsonl --outputs data/llm/outputs.jsonl --error-rate 0.2
-poetry run python -m llm_etl_eval.transform.run --schema data/expected/target_schema.json --llm-outputs data/llm/outputs.jsonl --out-dir data/final
-poetry run python -m llm_etl_eval.eval.run --inputs data/processed/llm_inputs.jsonl --outputs data/llm/outputs.jsonl --gold data/gold/labels.jsonl --schema data/expected/target_schema.json --out reports/
-poetry run python -m llm_etl_eval.checks.run --baseline reports/example/report.json --current reports/latest/report.json
+bash scripts/demo_interview.sh
 ```
 
-## Design Choices
+**Screenshot-Friendly Report Snippet**
 
-**Schemas / Contracts**
-- JSON Schema defines the downstream contract and gates both transform and evaluation.
-- Typed dataclasses for ETL and LLM outputs enforce predictable structure throughout the pipeline.
+```markdown
+# Evaluation Report
 
-**Parsing / Guardrails**
-- Tolerant JSON parsing handles markdown fences and trailing text.
-- Coercion rules convert common model mistakes (e.g., item → list) while tracking structured errors.
-- Transform rejects invalid records with explicit, machine‑readable failure reasons.
+## Summary
+- Records: 200
+- Gold records: 200
+- Schema validity rate: 92.50%
+- Completeness rate: 98.00%
+- Field accuracy (overall): 94.10%
+- Constraint violations per record: 0.08
+- Consistency rate: 99.50%
 
-**Evaluation Strategy**
-- Schema validity: hard correctness for downstream systems.
-- Field‑level accuracy vs. gold: correctness on critical fields.
-- Completeness: coverage of required fields.
-- Constraint violations: enum/range guardrail adherence.
-- Consistency: stability across repeated runs.
-- Error taxonomy: actionable error clustering.
+## Error Taxonomy
+- missing_required: 6
+- enum_mismatch: 4
+```
 
-## How to Extend
+**Why This Is Credible**
 
-- Plug real LLM calls: replace the simulator by wiring `prompting/*` into an API client; keep output JSONL for compatibility.
-- Add new schemas: update `data/expected/*.json`, then re‑use transform + eval by passing a new schema path.
-- Add new metrics: implement in `src/llm_etl_eval/eval/metrics.py` and extend `report.py`.
+- Improvements are config-driven knobs, not just a lower simulator error rate.
+- Baseline vs. improved runs keep the simulator settings fixed.
+- Round-trip checks prove that `accepted.jsonl` is safe to ingest as a target-system payload.
 
-## Repo Map
+**Repo Map**
 
+- `src/llm_etl_eval/contracts/` — typed data contracts + validation
 - `src/llm_etl_eval/etl/` — ingest, clean, join, normalize
-- `src/llm_etl_eval/prompting/` — prompt templates and contracts
+- `src/llm_etl_eval/prompting/` — prompt templates + strictness controls
 - `src/llm_etl_eval/sim/` — deterministic output simulator
 - `src/llm_etl_eval/transform/` — tolerant parse, coercion, mapping, rejection handling
 - `src/llm_etl_eval/eval/` — schema validation, metrics, reporting
-- `src/llm_etl_eval/checks/` — monitoring‑style checks
-
+- `src/llm_etl_eval/checks/` — monitoring + round-trip verification

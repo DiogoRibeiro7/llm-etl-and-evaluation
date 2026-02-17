@@ -2,7 +2,16 @@
 
 from __future__ import annotations
 
-TARGET_SCHEMA_INSTRUCTIONS = """
+MINIMAL_INSTRUCTIONS = """
+You are a data normalization assistant. Produce a JSON object that matches the target schema.
+
+Rules:
+- Output only JSON (no markdown, no commentary).
+- Required fields: ticket_id, customer_id, created_at, language, summary, category, priority, entities, actions.
+- Do not include additional fields.
+""".strip()
+
+STRICT_INSTRUCTIONS = """
 You are a data normalization assistant. Produce a JSON object that matches the target schema.
 
 Rules:
@@ -16,3 +25,25 @@ Rules:
 - actions is a non-empty array of objects with keys: action, owner, due_at; optional status.
 - Do not include additional fields.
 """.strip()
+
+
+def build_system_instructions(
+    strictness: str = "minimal",
+    *,
+    schema_reminders: bool = False,
+    schema_json: str | None = None,
+) -> str:
+    """Build system instructions with optional schema reminders."""
+
+    strictness_value = strictness.lower()
+    if strictness_value == "strict":
+        instructions = STRICT_INSTRUCTIONS
+    else:
+        instructions = MINIMAL_INSTRUCTIONS
+
+    if schema_reminders and schema_json:
+        return f"{instructions}\n\nSchema reminder:\n{schema_json}"
+    return instructions
+
+
+TARGET_SCHEMA_INSTRUCTIONS = STRICT_INSTRUCTIONS

@@ -36,8 +36,10 @@ def _validate_required(payload: dict[str, Any], errors: list[TransformError]) ->
             )
 
 
-def _map_entities(value: Any, errors: list[TransformError]) -> list[dict[str, Any]]:
-    entities = coerce_list(value, "entities", errors)
+def _map_entities(
+    value: Any, errors: list[TransformError], allow_coercion: bool
+) -> list[dict[str, Any]]:
+    entities = coerce_list(value, "entities", errors, allow_coercion=allow_coercion)
     mapped: list[dict[str, Any]] = []
     for idx, entity in enumerate(entities):
         if not isinstance(entity, dict):
@@ -54,10 +56,25 @@ def _map_entities(value: Any, errors: list[TransformError]) -> list[dict[str, An
 
         mapped.append(
             {
-                "type": coerce_string(entity.get("type"), f"entities[{idx}].type", errors) or "",
-                "value": coerce_string(entity.get("value"), f"entities[{idx}].value", errors) or "",
+                "type": coerce_string(
+                    entity.get("type"),
+                    f"entities[{idx}].type",
+                    errors,
+                    allow_coercion=allow_coercion,
+                )
+                or "",
+                "value": coerce_string(
+                    entity.get("value"),
+                    f"entities[{idx}].value",
+                    errors,
+                    allow_coercion=allow_coercion,
+                )
+                or "",
                 "confidence": coerce_float(
-                    entity.get("confidence"), f"entities[{idx}].confidence", errors
+                    entity.get("confidence"),
+                    f"entities[{idx}].confidence",
+                    errors,
+                    allow_coercion=allow_coercion,
                 )
                 or 0.0,
             }
@@ -65,8 +82,10 @@ def _map_entities(value: Any, errors: list[TransformError]) -> list[dict[str, An
     return mapped
 
 
-def _map_actions(value: Any, errors: list[TransformError]) -> list[dict[str, Any]]:
-    actions = coerce_list(value, "actions", errors)
+def _map_actions(
+    value: Any, errors: list[TransformError], allow_coercion: bool
+) -> list[dict[str, Any]]:
+    actions = coerce_list(value, "actions", errors, allow_coercion=allow_coercion)
     mapped: list[dict[str, Any]] = []
     for idx, action in enumerate(actions):
         if not isinstance(action, dict):
@@ -83,31 +102,77 @@ def _map_actions(value: Any, errors: list[TransformError]) -> list[dict[str, Any
 
         mapped.append(
             {
-                "action": coerce_string(action.get("action"), f"actions[{idx}].action", errors) or "",
-                "owner": coerce_string(action.get("owner"), f"actions[{idx}].owner", errors) or "",
-                "due_at": coerce_string(action.get("due_at"), f"actions[{idx}].due_at", errors) or "",
-                "status": coerce_string(action.get("status"), f"actions[{idx}].status", errors),
+                "action": coerce_string(
+                    action.get("action"),
+                    f"actions[{idx}].action",
+                    errors,
+                    allow_coercion=allow_coercion,
+                )
+                or "",
+                "owner": coerce_string(
+                    action.get("owner"),
+                    f"actions[{idx}].owner",
+                    errors,
+                    allow_coercion=allow_coercion,
+                )
+                or "",
+                "due_at": coerce_string(
+                    action.get("due_at"),
+                    f"actions[{idx}].due_at",
+                    errors,
+                    allow_coercion=allow_coercion,
+                )
+                or "",
+                "status": coerce_string(
+                    action.get("status"),
+                    f"actions[{idx}].status",
+                    errors,
+                    allow_coercion=allow_coercion,
+                ),
             }
         )
     return mapped
 
 
-def map_payload(payload: dict[str, Any]) -> tuple[dict[str, Any], list[TransformError]]:
+def map_payload(
+    payload: dict[str, Any], *, allow_coercion: bool = True
+) -> tuple[dict[str, Any], list[TransformError]]:
     """Map and coerce payload into target system field structure."""
 
     errors: list[TransformError] = []
     _validate_required(payload, errors)
 
     mapped = {
-        "ticket_id": coerce_string(payload.get("ticket_id"), "ticket_id", errors) or "",
-        "customer_id": coerce_string(payload.get("customer_id"), "customer_id", errors) or "",
-        "created_at": coerce_string(payload.get("created_at"), "created_at", errors) or "",
-        "language": coerce_string(payload.get("language"), "language", errors) or "",
-        "summary": coerce_string(payload.get("summary"), "summary", errors) or "",
-        "category": coerce_string(payload.get("category"), "category", errors) or "",
-        "priority": coerce_string(payload.get("priority"), "priority", errors) or "",
-        "entities": _map_entities(payload.get("entities"), errors),
-        "actions": _map_actions(payload.get("actions"), errors),
+        "ticket_id": coerce_string(
+            payload.get("ticket_id"), "ticket_id", errors, allow_coercion=allow_coercion
+        )
+        or "",
+        "customer_id": coerce_string(
+            payload.get("customer_id"), "customer_id", errors, allow_coercion=allow_coercion
+        )
+        or "",
+        "created_at": coerce_string(
+            payload.get("created_at"), "created_at", errors, allow_coercion=allow_coercion
+        )
+        or "",
+        "language": coerce_string(
+            payload.get("language"), "language", errors, allow_coercion=allow_coercion
+        )
+        or "",
+        "summary": coerce_string(
+            payload.get("summary"), "summary", errors, allow_coercion=allow_coercion
+        )
+        or "",
+        "category": coerce_string(
+            payload.get("category"), "category", errors, allow_coercion=allow_coercion
+        )
+        or "",
+        "priority": coerce_string(
+            payload.get("priority"), "priority", errors, allow_coercion=allow_coercion
+        )
+        or "",
+        "entities": _map_entities(payload.get("entities"), errors, allow_coercion=allow_coercion),
+        "actions": _map_actions(payload.get("actions"), errors, allow_coercion=allow_coercion),
     }
 
     return mapped, errors

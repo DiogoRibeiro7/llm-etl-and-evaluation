@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
-from llm_etl_eval.etl.models import CleanEvent, CleanTicket, JoinedRecord, LlmInputRecord
+from llm_etl_eval.contracts import ActionRecord, CanonicalInputRecord, EntityRecord
+from llm_etl_eval.etl.models import CleanEvent, CleanTicket, JoinedRecord
 
 CATEGORY_ENUM = {"billing", "account", "technical", "security", "shipping", "product"}
 PRIORITY_ENUM = {"low", "medium", "high", "urgent"}
@@ -68,18 +69,18 @@ def _pick_language(ticket: CleanTicket) -> str:
     return "en"
 
 
-def _build_entities(ticket: CleanTicket) -> list[dict[str, object]]:
+def _build_entities(ticket: CleanTicket) -> list[EntityRecord]:
     """Extract minimal entities from ticket metadata."""
 
-    entities: list[dict[str, object]] = []
+    entities: list[EntityRecord] = []
     for key in ("region", "browser"):
         value = ticket.metadata.get(key)
         if isinstance(value, str) and value.strip():
-            entities.append({"type": key, "value": value, "confidence": 0.7})
+            entities.append(EntityRecord(type=key, value=value, confidence=0.7))
     return entities
 
 
-def _build_actions(created_at: datetime, events: list[CleanEvent]) -> list[dict[str, object]]:
+def _build_actions(created_at: datetime, events: list[CleanEvent]) -> list[ActionRecord]:
     """Create a default action list using event data."""
 
     owner = "system"
@@ -91,16 +92,16 @@ def _build_actions(created_at: datetime, events: list[CleanEvent]) -> list[dict[
 
     due_at = created_at + timedelta(days=1)
     return [
-        {
-            "action": "triage",
-            "owner": owner,
-            "due_at": due_at.isoformat(),
-            "status": "open",
-        }
+        ActionRecord(
+            action="triage",
+            owner=owner,
+            due_at=due_at.isoformat(),
+            status="open",
+        )
     ]
 
 
-def normalize_record(joined: JoinedRecord) -> LlmInputRecord:
+def normalize_record(joined: JoinedRecord) -> CanonicalInputRecord:
     """Normalize a joined record into the LLM-ready schema."""
 
     ticket = joined.ticket
@@ -108,7 +109,7 @@ def normalize_record(joined: JoinedRecord) -> LlmInputRecord:
 
     created_at = _pick_created_at(ticket, events)
 
-    return LlmInputRecord(
+    return CanonicalInputRecord(
         ticket_id=ticket.ticket_id,
         customer_id=ticket.customer_id,
         created_at=created_at.isoformat(),
@@ -121,7 +122,7 @@ def normalize_record(joined: JoinedRecord) -> LlmInputRecord:
     )
 
 
-def normalize_all(joined_records: list[JoinedRecord]) -> list[LlmInputRecord]:
+def normalize_all(joined_records: list[JoinedRecord]) -> list[CanonicalInputRecord]:
     """Normalize all joined records."""
 
     return [normalize_record(record) for record in joined_records]
