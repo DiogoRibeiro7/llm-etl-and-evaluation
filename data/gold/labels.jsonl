@@ -1,50 +1,50 @@
-{"category": "billing", "customer_id": "CUST-200", "priority": "low", "summary": "Issue 1000 billing problem", "ticket_id": "TKT-1000"}
-{"category": "account", "customer_id": "CUST-201", "priority": "medium", "summary": "Issue 1001 account problem", "ticket_id": "TKT-1001"}
-{"category": "technical", "customer_id": "CUST-202", "priority": "high", "summary": "Issue 1002 technical problem", "ticket_id": "TKT-1002"}
-{"category": "security", "customer_id": "CUST-203", "priority": "urgent", "summary": "Issue 1003 security problem", "ticket_id": "TKT-1003"}
-{"category": "shipping", "customer_id": "CUST-204", "priority": "low", "summary": "Issue 1004 shipping problem", "ticket_id": "TKT-1004"}
-{"category": "product", "customer_id": "CUST-205", "priority": "medium", "summary": "Issue 1005 product problem", "ticket_id": "TKT-1005"}
-{"category": "billing", "customer_id": "CUST-206", "priority": "high", "summary": "Issue 1006 billing problem", "ticket_id": "TKT-1006"}
-{"category": "account", "customer_id": "CUST-207", "priority": "urgent", "summary": "Issue 1007 account problem", "ticket_id": "TKT-1007"}
-{"category": "technical", "customer_id": "CUST-208", "priority": "low", "summary": "Issue 1008 technical problem", "ticket_id": "TKT-1008"}
-{"category": "security", "customer_id": "CUST-209", "priority": "medium", "summary": "Issue 1009 security problem", "ticket_id": "TKT-1009"}
-{"category": "shipping", "customer_id": "CUST-210", "priority": "high", "summary": "Issue 1010 shipping problem", "ticket_id": "TKT-1010"}
-{"category": "product", "customer_id": "CUST-211", "priority": "urgent", "summary": "Issue 1011 product problem", "ticket_id": "TKT-1011"}
-{"category": "billing", "customer_id": "CUST-212", "priority": "low", "summary": "Issue 1012 billing problem", "ticket_id": "TKT-1012"}
-{"category": "account", "customer_id": "CUST-213", "priority": "medium", "summary": "Issue 1013 account problem", "ticket_id": "TKT-1013"}
-{"category": "technical", "customer_id": "CUST-214", "priority": "high", "summary": "Issue 1014 technical problem", "ticket_id": "TKT-1014"}
-{"category": "security", "customer_id": "CUST-215", "priority": "urgent", "summary": "Issue 1015 security problem", "ticket_id": "TKT-1015"}
-{"category": "shipping", "customer_id": "CUST-216", "priority": "low", "summary": "Issue 1016 shipping problem", "ticket_id": "TKT-1016"}
-{"category": "product", "customer_id": "CUST-217", "priority": "medium", "summary": "Issue 1017 product problem", "ticket_id": "TKT-1017"}
-{"category": "billing", "customer_id": "CUST-218", "priority": "high", "summary": "Issue 1018 billing problem", "ticket_id": "TKT-1018"}
-{"category": "account", "customer_id": "CUST-219", "priority": "urgent", "summary": "Issue 1019 account problem", "ticket_id": "TKT-1019"}
-{"category": "technical", "customer_id": "CUST-220", "priority": "low", "summary": "Issue 1020 technical problem", "ticket_id": "TKT-1020"}
-{"category": "security", "customer_id": "CUST-221", "priority": "medium", "summary": "Issue 1021 security problem", "ticket_id": "TKT-1021"}
-{"category": "shipping", "customer_id": "CUST-222", "priority": "high", "summary": "Issue 1022 shipping problem", "ticket_id": "TKT-1022"}
-{"category": "product", "customer_id": "CUST-223", "priority": "urgent", "summary": "Issue 1023 product problem", "ticket_id": "TKT-1023"}
-{"category": "billing", "customer_id": "CUST-224", "priority": "low", "summary": "Issue 1024 billing problem", "ticket_id": "TKT-1024"}
-{"category": "account", "customer_id": "CUST-225", "priority": "medium", "summary": "Issue 1025 account problem", "ticket_id": "TKT-1025"}
-{"category": "technical", "customer_id": "CUST-226", "priority": "high", "summary": "Issue 1026 technical problem", "ticket_id": "TKT-1026"}
-{"category": "security", "customer_id": "CUST-227", "priority": "urgent", "summary": "Issue 1027 security problem", "ticket_id": "TKT-1027"}
-{"category": "shipping", "customer_id": "CUST-228", "priority": "low", "summary": "Issue 1028 shipping problem", "ticket_id": "TKT-1028"}
-{"category": "product", "customer_id": "CUST-229", "priority": "medium", "summary": "Issue 1029 product problem", "ticket_id": "TKT-1029"}
-{"category": "billing", "customer_id": "CUST-230", "priority": "high", "summary": "Issue 1030 billing problem", "ticket_id": "TKT-1030"}
-{"category": "account", "customer_id": "CUST-231", "priority": "urgent", "summary": "Issue 1031 account problem", "ticket_id": "TKT-1031"}
-{"category": "technical", "customer_id": "CUST-232", "priority": "low", "summary": "Issue 1032 technical problem", "ticket_id": "TKT-1032"}
-{"category": "security", "customer_id": "CUST-233", "priority": "medium", "summary": "Issue 1033 security problem", "ticket_id": "TKT-1033"}
-{"category": "shipping", "customer_id": "CUST-234", "priority": "high", "summary": "Issue 1034 shipping problem", "ticket_id": "TKT-1034"}
-{"category": "product", "customer_id": "CUST-235", "priority": "urgent", "summary": "Issue 1035 product problem", "ticket_id": "TKT-1035"}
-{"category": "billing", "customer_id": "CUST-236", "priority": "low", "summary": "Issue 1036 billing problem", "ticket_id": "TKT-1036"}
-{"category": "account", "customer_id": "CUST-237", "priority": "medium", "summary": "Issue 1037 account problem", "ticket_id": "TKT-1037"}
-{"category": "technical", "customer_id": "CUST-238", "priority": "high", "summary": "Issue 1038 technical problem", "ticket_id": "TKT-1038"}
-{"category": "security", "customer_id": "CUST-239", "priority": "urgent", "summary": "Issue 1039 security problem", "ticket_id": "TKT-1039"}
-{"category": "shipping", "customer_id": "CUST-240", "priority": "low", "summary": "Issue 1040 shipping problem", "ticket_id": "TKT-1040"}
-{"category": "product", "customer_id": "CUST-241", "priority": "medium", "summary": "Issue 1041 product problem", "ticket_id": "TKT-1041"}
-{"category": "billing", "customer_id": "CUST-242", "priority": "high", "summary": "Issue 1042 billing problem", "ticket_id": "TKT-1042"}
-{"category": "account", "customer_id": "CUST-243", "priority": "urgent", "summary": "Issue 1043 account problem", "ticket_id": "TKT-1043"}
-{"category": "technical", "customer_id": "CUST-244", "priority": "low", "summary": "Issue 1044 technical problem", "ticket_id": "TKT-1044"}
-{"category": "security", "customer_id": "CUST-245", "priority": "medium", "summary": "Issue 1045 security problem", "ticket_id": "TKT-1045"}
-{"category": "shipping", "customer_id": "CUST-246", "priority": "high", "summary": "Issue 1046 shipping problem", "ticket_id": "TKT-1046"}
-{"category": "product", "customer_id": "CUST-247", "priority": "urgent", "summary": "Issue 1047 product problem", "ticket_id": "TKT-1047"}
-{"category": "billing", "customer_id": "CUST-248", "priority": "low", "summary": "Issue 1048 billing problem", "ticket_id": "TKT-1048"}
-{"category": "account", "customer_id": "CUST-249", "priority": "medium", "summary": "Issue 1049 account problem", "ticket_id": "TKT-1049"}
+{"category": "billing", "customer_id": "CUST-202", "priority": "medium", "summary": "Summary unavailable", "ticket_id": "TKT-1000"}
+{"category": "product", "customer_id": "CUST-219", "priority": "high", "summary": "PDF export missing footer information", "ticket_id": "TKT-1001"}
+{"category": "shipping", "customer_id": "CUST-236", "priority": "urgent", "summary": "Order shows delivered but never received", "ticket_id": "TKT-1002"}
+{"category": "security", "customer_id": "CUST-203", "priority": "low", "summary": "Unauthorized access alert from Italy", "ticket_id": "TKT-1003"}
+{"category": "technical", "customer_id": "CUST-220", "priority": "medium", "summary": "App crashes on launch after recent update", "ticket_id": "TKT-1004"}
+{"category": "account", "customer_id": "CUST-237", "priority": "high", "summary": "Email change request pending for two weeks", "ticket_id": "TKT-1005"}
+{"category": "billing", "customer_id": "CUST-204", "priority": "urgent", "summary": "Refund requested for duplicate charge", "ticket_id": "TKT-1006"}
+{"category": "product", "customer_id": "CUST-221", "priority": "low", "summary": "Summary unavailable", "ticket_id": "TKT-1007"}
+{"category": "shipping", "customer_id": "CUST-238", "priority": "medium", "summary": "Order shows delivered but never received", "ticket_id": "TKT-1008"}
+{"category": "security", "customer_id": "CUST-205", "priority": "high", "summary": "Session token leaked in URL params", "ticket_id": "TKT-1009"}
+{"category": "technical", "customer_id": "CUST-222", "priority": "medium", "summary": "Latency spikes in EU region", "ticket_id": "TKT-1010"}
+{"category": "billing", "customer_id": "CUST-239", "priority": "high", "summary": "Refund requested for duplicate charge", "ticket_id": "TKT-1011"}
+{"category": "billing", "customer_id": "CUST-206", "priority": "medium", "summary": "Annual plan billed monthly by mistake", "ticket_id": "TKT-1012"}
+{"category": "product", "customer_id": "CUST-223", "priority": "high", "summary": "PDF export missing footer information", "ticket_id": "TKT-1013"}
+{"category": "shipping", "customer_id": "CUST-240", "priority": "urgent", "summary": "Summary unavailable", "ticket_id": "TKT-1014"}
+{"category": "security", "customer_id": "CUST-207", "priority": "low", "summary": "Suspicious login detected from new device", "ticket_id": "TKT-1015"}
+{"category": "technical", "customer_id": "CUST-224", "priority": "medium", "summary": "Login fails after update on iOS", "ticket_id": "TKT-1016"}
+{"category": "account", "customer_id": "CUST-241", "priority": "high", "summary": "Profile picture upload fails silently", "ticket_id": "TKT-1017"}
+{"category": "billing", "customer_id": "CUST-208", "priority": "urgent", "summary": "Promo code did not apply at checkout", "ticket_id": "TKT-1018"}
+{"category": "product", "customer_id": "CUST-225", "priority": "low", "summary": "PDF export missing footer information", "ticket_id": "TKT-1019"}
+{"category": "shipping", "customer_id": "CUST-242", "priority": "medium", "summary": "Order shows delivered but never received", "ticket_id": "TKT-1020"}
+{"category": "security", "customer_id": "CUST-209", "priority": "high", "summary": "Summary unavailable", "ticket_id": "TKT-1021"}
+{"category": "technical", "customer_id": "CUST-226", "priority": "urgent", "summary": "Mobile app freezes on dashboard", "ticket_id": "TKT-1022"}
+{"category": "account", "customer_id": "CUST-243", "priority": "low", "summary": "Account locked after too many attempts", "ticket_id": "TKT-1023"}
+{"category": "billing", "customer_id": "CUST-210", "priority": "medium", "summary": "Invoice mismatch between portal and email", "ticket_id": "TKT-1024"}
+{"category": "product", "customer_id": "CUST-227", "priority": "high", "summary": "PDF export missing footer information", "ticket_id": "TKT-1025"}
+{"category": "shipping", "customer_id": "CUST-244", "priority": "urgent", "summary": "Order shows delivered but never received", "ticket_id": "TKT-1026"}
+{"category": "security", "customer_id": "CUST-211", "priority": "low", "summary": "Strange device listed in active sessions", "ticket_id": "TKT-1027"}
+{"category": "technical", "customer_id": "CUST-228", "priority": "medium", "summary": "Summary unavailable", "ticket_id": "TKT-1028"}
+{"category": "account", "customer_id": "CUST-245", "priority": "high", "summary": "Cannot delete account from settings", "ticket_id": "TKT-1029"}
+{"category": "billing", "customer_id": "CUST-212", "priority": "urgent", "summary": "Refund requested for duplicate charge", "ticket_id": "TKT-1030"}
+{"category": "product", "customer_id": "CUST-229", "priority": "low", "summary": "PDF export missing footer information", "ticket_id": "TKT-1031"}
+{"category": "shipping", "customer_id": "CUST-246", "priority": "medium", "summary": "Order shows delivered but never received", "ticket_id": "TKT-1032"}
+{"category": "security", "customer_id": "CUST-213", "priority": "high", "summary": "Unauthorized access alert from Italy", "ticket_id": "TKT-1033"}
+{"category": "technical", "customer_id": "CUST-230", "priority": "urgent", "summary": "Sync fails between desktop and mobile", "ticket_id": "TKT-1034"}
+{"category": "account", "customer_id": "CUST-247", "priority": "low", "summary": "Summary unavailable", "ticket_id": "TKT-1035"}
+{"category": "billing", "customer_id": "CUST-214", "priority": "medium", "summary": "Annual plan billed monthly by mistake", "ticket_id": "TKT-1036"}
+{"category": "product", "customer_id": "CUST-231", "priority": "high", "summary": "PDF export missing footer information", "ticket_id": "TKT-1037"}
+{"category": "shipping", "customer_id": "CUST-248", "priority": "urgent", "summary": "Order shows delivered but never received", "ticket_id": "TKT-1038"}
+{"category": "security", "customer_id": "CUST-215", "priority": "low", "summary": "Session token leaked in URL params", "ticket_id": "TKT-1039"}
+{"category": "technical", "customer_id": "CUST-232", "priority": "medium", "summary": "API returning 500 on /v2/tickets", "ticket_id": "TKT-1040"}
+{"category": "account", "customer_id": "CUST-249", "priority": "high", "summary": "Username already taken on signup", "ticket_id": "TKT-1041"}
+{"category": "billing", "customer_id": "CUST-216", "priority": "urgent", "summary": "Summary unavailable", "ticket_id": "TKT-1042"}
+{"category": "product", "customer_id": "CUST-233", "priority": "low", "summary": "PDF export missing footer information", "ticket_id": "TKT-1043"}
+{"category": "shipping", "customer_id": "CUST-200", "priority": "medium", "summary": "Order shows delivered but never received", "ticket_id": "TKT-1044"}
+{"category": "security", "customer_id": "CUST-217", "priority": "high", "summary": "Suspicious login detected from new device", "ticket_id": "TKT-1045"}
+{"category": "technical", "customer_id": "CUST-234", "priority": "urgent", "summary": "App crashes on launch after recent update", "ticket_id": "TKT-1046"}
+{"category": "account", "customer_id": "CUST-201", "priority": "low", "summary": "Email change request pending for two weeks", "ticket_id": "TKT-1047"}
+{"category": "billing", "customer_id": "CUST-218", "priority": "medium", "summary": "Invoice mismatch between portal and email", "ticket_id": "TKT-1048"}
+{"category": "product", "customer_id": "CUST-235", "priority": "high", "summary": "Summary unavailable", "ticket_id": "TKT-1049"}

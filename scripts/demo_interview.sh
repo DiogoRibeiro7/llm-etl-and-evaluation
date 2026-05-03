@@ -68,6 +68,22 @@ poetry run python -m llm_etl_eval.eval.run \
   --schema "$SCHEMA_PATH" \
   --out reports/baseline
 
+poetry run python -m llm_etl_eval.manifest.run \
+  --out reports/baseline/manifest.json \
+  --label baseline \
+  --config "$BASELINE_CONFIG" \
+  --schema "$SCHEMA_PATH" \
+  --inputs data/processed/llm_inputs.jsonl \
+  --outputs data/llm/outputs_baseline.jsonl \
+  --gold data/gold/labels.jsonl \
+  --prompts data/llm/prompts_baseline.jsonl \
+  --seed 7 \
+  --error-rate "$ERROR_RATE"
+
+poetry run python -m llm_etl_eval.eval.error_clusters_run \
+  --rejected data/final/baseline/rejected.jsonl \
+  --out reports/baseline/clusters.json
+
 echo ""
 echo ">> [7/9] Generating IMPROVED prompts (config-driven)"
 poetry run python -m llm_etl_eval.prompting.run \
@@ -103,6 +119,30 @@ poetry run python -m llm_etl_eval.eval.run \
   --gold data/gold/labels.jsonl \
   --schema "$SCHEMA_PATH" \
   --out reports/improved
+
+poetry run python -m llm_etl_eval.manifest.run \
+  --out reports/improved/manifest.json \
+  --label improved \
+  --config "$IMPROVED_CONFIG" \
+  --schema "$SCHEMA_PATH" \
+  --inputs data/processed/llm_inputs.jsonl \
+  --outputs data/llm/outputs_improved.jsonl \
+  --gold data/gold/labels.jsonl \
+  --prompts data/llm/prompts_improved.jsonl \
+  --seed 7 \
+  --error-rate "$ERROR_RATE"
+
+poetry run python -m llm_etl_eval.eval.error_clusters_run \
+  --rejected data/final/improved/rejected.jsonl \
+  --out reports/improved/clusters.json
+
+echo ""
+echo ">> Distribution drift: improved vs baseline (PSI + JSD)"
+poetry run python -m llm_etl_eval.checks.distribution_drift_run \
+  --reference data/llm/outputs_baseline.jsonl \
+  --candidate data/llm/outputs_improved.jsonl \
+  --fields category priority language \
+  --out reports/improved/drift.json
 
 poetry run python - <<'PY'
 import json
