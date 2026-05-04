@@ -118,6 +118,50 @@ def coerce_string(
     return None
 
 
+def backfill_required_summary(
+    parsed: dict[str, Any],
+    input_record: dict[str, Any] | None,
+    errors: list[TransformError],
+    *,
+    allow_coercion: bool = True,
+) -> dict[str, Any]:
+    """Backfill a missing or empty `summary` from the canonical input record.
+
+    Returns a new dict with `summary` replaced when:
+      - allow_coercion is True
+      - input_record is provided and has a non-empty summary
+      - the parsed output's summary is missing, None, or whitespace-only
+
+    Otherwise returns `parsed` unchanged. Emits a warning-severity
+    TransformError so the rescue is visible in the rejected/cluster report
+    rather than silently masking model failures.
+    """
+
+    if not allow_coercion or input_record is None:
+        return parsed
+
+    current = parsed.get("summary")
+    if isinstance(current, str) and current.strip():
+        return parsed
+
+    fallback = input_record.get("summary")
+    if not isinstance(fallback, str) or not fallback.strip():
+        return parsed
+
+    new_parsed = dict(parsed)
+    new_parsed["summary"] = fallback.strip()
+    errors.append(
+        TransformError(
+            code="backfill_summary",
+            message="Backfilled missing summary from input record.",
+            field_path="summary",
+            severity="warning",
+            raw_value=current,
+        )
+    )
+    return new_parsed
+
+
 def coerce_enum(
     value: Any,
     valid_values: set[str],

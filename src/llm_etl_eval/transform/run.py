@@ -14,7 +14,8 @@ from llm_etl_eval.contracts import (
     parse_llm_output_record,
     parse_target_system_record,
 )
-from llm_etl_eval.eval.schema_validate import SchemaIssue, validate_schema
+from llm_etl_eval.eval.schema_validate import validate_schema
+from llm_etl_eval.transform.coerce import backfill_required_summary
 from llm_etl_eval.transform.errors import TransformError
 from llm_etl_eval.transform.map import map_payload
 from llm_etl_eval.transform.parse import parse_json
@@ -84,17 +85,40 @@ def _load_config(path: Path | None) -> PipelineConfig:
     return load_config(path)
 
 
+def _load_inputs_by_id(inputs_path: Path | None) -> dict[str, dict[str, Any]]:
+    """Load canonical input records keyed by ticket_id for backfill lookups."""
+
+    if inputs_path is None:
+        return {}
+    by_id: dict[str, dict[str, Any]] = {}
+    for line in inputs_path.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        record = json.loads(line)
+        ticket_id = record.get("ticket_id")
+        if isinstance(ticket_id, str):
+            by_id[ticket_id] = record
+    return by_id
+
+
 def run_transform(
     schema_path: Path,
     llm_outputs_path: Path,
     out_dir: Path,
     config_path: Path | None = None,
+    inputs_path: Path | None = None,
 ) -> None:
-    """Run the transformation pipeline."""
+    """Run the transformation pipeline.
+
+    `inputs_path` is optional — when provided, missing required fields
+    (currently only `summary`) can be backfilled from the canonical
+    input record before contract validation, gated by `coercion.enabled`.
+    """
 
     schema = _load_schema(schema_path)
     lines = _load_lines(llm_outputs_path)
     config = _load_config(config_path)
+    inputs_by_id = _load_inputs_by_id(inputs_path)
 
     accepted: list[dict[str, Any]] = []
     rejected: list[dict[str, Any]] = []
@@ -113,8 +137,25 @@ def run_transform(
             )
             continue
 
+        backfill_errors: list[TransformError] = []
+        if inputs_by_id:
+            ticket_id = parsed.get("ticket_id")
+            input_record = (
+                inputs_by_id.get(ticket_id) if isinstance(ticket_id, str) else None
+            )
+            parsed = backfill_required_summary(
+                parsed,
+                input_record,
+                backfill_errors,
+                allow_coercion=config.coercion_enabled,
+            )
+
         _, llm_contract_errors = parse_llm_output_record(parsed)
-        errors = parse_errors + _contract_errors_to_transform(llm_contract_errors)
+        errors = (
+            parse_errors
+            + backfill_errors
+            + _contract_errors_to_transform(llm_contract_errors)
+        )
 
         if any(error.severity == "error" for error in errors):
             rejected.append(
@@ -187,6 +228,16 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
         help="Output directory for accepted/rejected records.",
     )
+    parser.add_argument(
+        "--inputs",
+        type=Path,
+        required=False,
+        help=(
+            "Optional canonical inputs JSONL. Enables backfill of missing "
+            "required fields (e.g., summary) from the input record when "
+            "coercion is enabled."
+        ),
+    )
     return parser
 
 
@@ -195,7 +246,13 @@ def main(argv: list[str] | None = None) -> int:
 
     parser = build_parser()
     args = parser.parse_args(argv)
-    run_transform(args.schema, args.llm_outputs, args.out_dir, args.config)
+    run_transform(
+        args.schema,
+        args.llm_outputs,
+        args.out_dir,
+        args.config,
+        args.inputs,
+    )
     return 0
 
 

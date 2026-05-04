@@ -79,7 +79,7 @@ def _run_full_pipeline(label: str, config_path: Path, work_dir: Path) -> dict[st
     outputs_path = llm_dir / f"outputs_{label}.jsonl"
     write_outputs(simulate_records(inputs, sim_config), outputs_path)
 
-    run_transform(SCHEMA_PATH, outputs_path, final_dir, config_path)
+    run_transform(SCHEMA_PATH, outputs_path, final_dir, config_path, inputs_path)
 
     accepted_path = final_dir / "accepted.jsonl"
     rejected_path = final_dir / "rejected.jsonl"

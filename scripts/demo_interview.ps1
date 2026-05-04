@@ -67,6 +67,7 @@ poetry run python -m llm_etl_eval.transform.run `
   --schema $schemaPath `
   --llm-outputs data/llm/outputs_baseline.jsonl `
   --config $baselineConfig `
+  --inputs data/processed/llm_inputs.jsonl `
   --out-dir data/final/baseline | Out-Host
 
 Step "[5/9] Round-trip BASELINE accepted outputs"
@@ -118,6 +119,7 @@ poetry run python -m llm_etl_eval.transform.run `
   --schema $schemaPath `
   --llm-outputs data/llm/outputs_improved.jsonl `
   --config $improvedConfig `
+  --inputs data/processed/llm_inputs.jsonl `
   --out-dir data/final/improved | Out-Host
 
 poetry run python -m llm_etl_eval.checks.roundtrip `

@@ -50,6 +50,7 @@ poetry run python -m llm_etl_eval.transform.run \
   --schema "$SCHEMA_PATH" \
   --llm-outputs data/llm/outputs_baseline.jsonl \
   --config "$BASELINE_CONFIG" \
+  --inputs data/processed/llm_inputs.jsonl \
   --out-dir data/final/baseline
 
 echo ""
@@ -106,6 +107,7 @@ poetry run python -m llm_etl_eval.transform.run \
   --schema "$SCHEMA_PATH" \
   --llm-outputs data/llm/outputs_improved.jsonl \
   --config "$IMPROVED_CONFIG" \
+  --inputs data/processed/llm_inputs.jsonl \
   --out-dir data/final/improved
 
 poetry run python -m llm_etl_eval.checks.roundtrip \

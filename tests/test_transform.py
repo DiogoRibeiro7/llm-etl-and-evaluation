@@ -7,6 +7,7 @@ from llm_etl_eval.transform.coerce import (
     CATEGORY_VALID,
     PRIORITY_SYNONYMS,
     PRIORITY_VALID,
+    backfill_required_summary,
     coerce_enum,
     coerce_list,
     coerce_string,
@@ -231,6 +232,76 @@ def test_map_payload_coerces_priority_synonym_when_enabled() -> None:
     mapped, errors = map_payload(payload, allow_coercion=True)
     assert mapped["priority"] == "urgent"
     assert any(error.code == "coerce_enum" for error in errors)
+
+
+def test_backfill_summary_uses_input_when_output_missing_summary() -> None:
+    errors: list[TransformError] = []
+    parsed = {"ticket_id": "TKT-1", "category": "billing"}
+    input_record = {"ticket_id": "TKT-1", "summary": "Charged twice for order 9832"}
+
+    result = backfill_required_summary(parsed, input_record, errors)
+
+    assert result["summary"] == "Charged twice for order 9832"
+    assert errors and errors[0].code == "backfill_summary"
+    assert errors[0].severity == "warning"
+    # Original parsed dict is not mutated.
+    assert "summary" not in parsed
+
+
+def test_backfill_summary_handles_empty_string_in_output() -> None:
+    errors: list[TransformError] = []
+    parsed = {"ticket_id": "TKT-1", "summary": "   "}
+    input_record = {"ticket_id": "TKT-1", "summary": "real summary"}
+
+    result = backfill_required_summary(parsed, input_record, errors)
+
+    assert result["summary"] == "real summary"
+    assert errors and errors[0].code == "backfill_summary"
+
+
+def test_backfill_summary_leaves_valid_summary_alone() -> None:
+    errors: list[TransformError] = []
+    parsed = {"ticket_id": "TKT-1", "summary": "model produced this"}
+    input_record = {"ticket_id": "TKT-1", "summary": "input had this"}
+
+    result = backfill_required_summary(parsed, input_record, errors)
+
+    assert result["summary"] == "model produced this"
+    assert errors == []
+
+
+def test_backfill_summary_disabled_does_not_backfill() -> None:
+    errors: list[TransformError] = []
+    parsed = {"ticket_id": "TKT-1"}
+    input_record = {"ticket_id": "TKT-1", "summary": "real summary"}
+
+    result = backfill_required_summary(
+        parsed, input_record, errors, allow_coercion=False,
+    )
+
+    assert "summary" not in result
+    assert errors == []
+
+
+def test_backfill_summary_returns_unchanged_when_input_missing() -> None:
+    errors: list[TransformError] = []
+    parsed = {"ticket_id": "TKT-1"}
+
+    result = backfill_required_summary(parsed, None, errors)
+
+    assert "summary" not in result
+    assert errors == []
+
+
+def test_backfill_summary_returns_unchanged_when_input_summary_empty() -> None:
+    errors: list[TransformError] = []
+    parsed = {"ticket_id": "TKT-1"}
+    input_record = {"ticket_id": "TKT-1", "summary": ""}
+
+    result = backfill_required_summary(parsed, input_record, errors)
+
+    assert "summary" not in result
+    assert errors == []
 
 
 def test_map_payload_leaves_priority_synonym_alone_when_disabled() -> None:
