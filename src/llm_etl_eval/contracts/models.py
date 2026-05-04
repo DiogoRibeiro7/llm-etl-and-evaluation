@@ -80,7 +80,7 @@ class TargetSystemRecord:
     actions: list[ActionRecord]
 
 
-_ALLOWED_FIELDS = {
+ALLOWED_FIELDS: frozenset[str] = frozenset({
     "ticket_id",
     "customer_id",
     "created_at",
@@ -90,7 +90,10 @@ _ALLOWED_FIELDS = {
     "priority",
     "entities",
     "actions",
-}
+})
+
+# Backwards-compat alias for internal callers still using the underscored name.
+_ALLOWED_FIELDS = ALLOWED_FIELDS
 
 
 def _add_error(

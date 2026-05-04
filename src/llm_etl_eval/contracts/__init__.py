@@ -1,6 +1,7 @@
 """Typed data contracts and validation helpers."""
 
 from llm_etl_eval.contracts.models import (
+    ALLOWED_FIELDS,
     ActionRecord,
     CanonicalInputRecord,
     ContractError,
@@ -13,6 +14,7 @@ from llm_etl_eval.contracts.models import (
 )
 
 __all__ = [
+    "ALLOWED_FIELDS",
     "ActionRecord",
     "CanonicalInputRecord",
     "ContractError",

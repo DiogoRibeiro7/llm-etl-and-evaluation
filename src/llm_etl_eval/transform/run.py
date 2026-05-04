@@ -10,12 +10,16 @@ from typing import Any
 
 from llm_etl_eval.config import PipelineConfig, load_config
 from llm_etl_eval.contracts import (
+    ALLOWED_FIELDS,
     ContractError,
     parse_llm_output_record,
     parse_target_system_record,
 )
 from llm_etl_eval.eval.schema_validate import validate_schema
-from llm_etl_eval.transform.coerce import backfill_required_summary
+from llm_etl_eval.transform.coerce import (
+    backfill_required_summary,
+    strip_unexpected_fields,
+)
 from llm_etl_eval.transform.errors import TransformError
 from llm_etl_eval.transform.map import map_payload
 from llm_etl_eval.transform.parse import parse_json
@@ -137,7 +141,13 @@ def run_transform(
             )
             continue
 
-        backfill_errors: list[TransformError] = []
+        coercion_warnings: list[TransformError] = []
+        parsed = strip_unexpected_fields(
+            parsed,
+            ALLOWED_FIELDS,
+            coercion_warnings,
+            allow_coercion=config.coercion_enabled,
+        )
         if inputs_by_id:
             ticket_id = parsed.get("ticket_id")
             input_record = (
@@ -146,14 +156,14 @@ def run_transform(
             parsed = backfill_required_summary(
                 parsed,
                 input_record,
-                backfill_errors,
+                coercion_warnings,
                 allow_coercion=config.coercion_enabled,
             )
 
         _, llm_contract_errors = parse_llm_output_record(parsed)
         errors = (
             parse_errors
-            + backfill_errors
+            + coercion_warnings
             + _contract_errors_to_transform(llm_contract_errors)
         )
 

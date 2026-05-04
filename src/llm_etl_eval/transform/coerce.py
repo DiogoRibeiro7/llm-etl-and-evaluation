@@ -118,6 +118,43 @@ def coerce_string(
     return None
 
 
+def strip_unexpected_fields(
+    parsed: dict[str, Any],
+    allowed: frozenset[str] | set[str],
+    errors: list[TransformError],
+    *,
+    allow_coercion: bool = True,
+) -> dict[str, Any]:
+    """Drop top-level keys that aren't in `allowed`.
+
+    Returns a new dict; `parsed` is not mutated. Emits one warning per
+    stripped field so the cluster report shows which hallucinated fields
+    the model produces most often. When `allow_coercion=False`, returns
+    `parsed` unchanged so the contract validator stays the source of
+    truth for rejections.
+    """
+
+    if not allow_coercion:
+        return parsed
+
+    extras = sorted(k for k in parsed if k not in allowed)
+    if not extras:
+        return parsed
+
+    new_parsed = {k: v for k, v in parsed.items() if k in allowed}
+    for extra in extras:
+        errors.append(
+            TransformError(
+                code="strip_unexpected_field",
+                message=f"Stripped unexpected field '{extra}'.",
+                field_path=extra,
+                severity="warning",
+                raw_value=parsed[extra],
+            )
+        )
+    return new_parsed
+
+
 def backfill_required_summary(
     parsed: dict[str, Any],
     input_record: dict[str, Any] | None,

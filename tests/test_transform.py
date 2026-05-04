@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from llm_etl_eval.contracts import ALLOWED_FIELDS
 from llm_etl_eval.transform.coerce import (
     CATEGORY_SYNONYMS,
     CATEGORY_VALID,
@@ -11,6 +12,7 @@ from llm_etl_eval.transform.coerce import (
     coerce_enum,
     coerce_list,
     coerce_string,
+    strip_unexpected_fields,
 )
 from llm_etl_eval.transform.errors import TransformError
 from llm_etl_eval.transform.map import map_payload
@@ -232,6 +234,64 @@ def test_map_payload_coerces_priority_synonym_when_enabled() -> None:
     mapped, errors = map_payload(payload, allow_coercion=True)
     assert mapped["priority"] == "urgent"
     assert any(error.code == "coerce_enum" for error in errors)
+
+
+def test_strip_unexpected_fields_removes_unknown_top_level_keys() -> None:
+    errors: list[TransformError] = []
+    parsed = {
+        "ticket_id": "TKT-1",
+        "summary": "x",
+        "hallucinated": {"note": "extra"},
+        "another_extra": 42,
+    }
+
+    result = strip_unexpected_fields(parsed, ALLOWED_FIELDS, errors)
+
+    assert "hallucinated" not in result
+    assert "another_extra" not in result
+    assert result["ticket_id"] == "TKT-1"
+    assert result["summary"] == "x"
+    # Original parsed dict is not mutated.
+    assert "hallucinated" in parsed
+    assert len(errors) == 2
+    codes = {e.code for e in errors}
+    field_paths = {e.field_path for e in errors}
+    assert codes == {"strip_unexpected_field"}
+    assert field_paths == {"another_extra", "hallucinated"}
+    assert all(e.severity == "warning" for e in errors)
+
+
+def test_strip_unexpected_fields_returns_unchanged_when_all_known() -> None:
+    errors: list[TransformError] = []
+    parsed = {"ticket_id": "TKT-1", "summary": "x", "category": "billing"}
+
+    result = strip_unexpected_fields(parsed, ALLOWED_FIELDS, errors)
+
+    assert result is parsed  # no rebuild needed
+    assert errors == []
+
+
+def test_strip_unexpected_fields_disabled_passes_through_for_contract_to_reject() -> None:
+    errors: list[TransformError] = []
+    parsed = {"ticket_id": "TKT-1", "hallucinated": "extra"}
+
+    result = strip_unexpected_fields(
+        parsed, ALLOWED_FIELDS, errors, allow_coercion=False,
+    )
+
+    assert "hallucinated" in result
+    assert errors == []
+
+
+def test_strip_unexpected_fields_emits_one_warning_per_field() -> None:
+    """Per-field warnings let cluster reports show which hallucinations dominate."""
+    errors: list[TransformError] = []
+    parsed = {"ticket_id": "TKT-1", "foo": 1, "bar": 2, "baz": 3}
+
+    strip_unexpected_fields(parsed, ALLOWED_FIELDS, errors)
+
+    field_paths = sorted(e.field_path for e in errors)
+    assert field_paths == ["bar", "baz", "foo"]
 
 
 def test_backfill_summary_uses_input_when_output_missing_summary() -> None:
