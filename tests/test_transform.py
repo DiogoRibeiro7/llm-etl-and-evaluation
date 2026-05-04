@@ -2,7 +2,15 @@
 
 from __future__ import annotations
 
-from llm_etl_eval.transform.coerce import coerce_list, coerce_string
+from llm_etl_eval.transform.coerce import (
+    CATEGORY_SYNONYMS,
+    CATEGORY_VALID,
+    PRIORITY_SYNONYMS,
+    PRIORITY_VALID,
+    coerce_enum,
+    coerce_list,
+    coerce_string,
+)
 from llm_etl_eval.transform.errors import TransformError
 from llm_etl_eval.transform.map import map_payload
 from llm_etl_eval.transform.parse import parse_json
@@ -122,3 +130,129 @@ def test_coerce_list_from_single_item() -> None:
     assert result == [value]
     assert errors
     assert errors[0].code == "coerce_list"
+
+
+def test_coerce_enum_passes_through_canonical_value() -> None:
+    errors: list[TransformError] = []
+    result = coerce_enum(
+        "urgent", PRIORITY_VALID, PRIORITY_SYNONYMS, "priority", errors,
+    )
+    assert result == "urgent"
+    assert errors == []
+
+
+def test_coerce_enum_normalizes_casing_when_allowed() -> None:
+    errors: list[TransformError] = []
+    result = coerce_enum(
+        "URGENT", PRIORITY_VALID, PRIORITY_SYNONYMS, "priority", errors,
+    )
+    assert result == "urgent"
+    assert errors and errors[0].code == "coerce_enum"
+    assert errors[0].severity == "warning"
+
+
+def test_coerce_enum_maps_priority_synonym_when_allowed() -> None:
+    errors: list[TransformError] = []
+    result = coerce_enum(
+        "critical", PRIORITY_VALID, PRIORITY_SYNONYMS, "priority", errors,
+    )
+    assert result == "urgent"
+    assert errors and errors[0].code == "coerce_enum"
+    assert errors[0].severity == "warning"
+
+
+def test_coerce_enum_disabled_passes_value_through_unchanged() -> None:
+    errors: list[TransformError] = []
+    result = coerce_enum(
+        "critical",
+        PRIORITY_VALID,
+        PRIORITY_SYNONYMS,
+        "priority",
+        errors,
+        allow_coercion=False,
+    )
+    # Schema validation is the source of truth when coercion is off.
+    assert result == "critical"
+    assert errors == []
+
+
+def test_coerce_enum_unknown_value_passes_through_for_schema_to_reject() -> None:
+    errors: list[TransformError] = []
+    result = coerce_enum(
+        "totally-made-up",
+        PRIORITY_VALID,
+        PRIORITY_SYNONYMS,
+        "priority",
+        errors,
+    )
+    assert result == "totally-made-up"
+    assert errors == []
+
+
+def test_coerce_enum_maps_category_synonym() -> None:
+    errors: list[TransformError] = []
+    result = coerce_enum(
+        "Tech Support",
+        CATEGORY_VALID,
+        CATEGORY_SYNONYMS,
+        "category",
+        errors,
+    )
+    assert result == "technical"
+    assert errors and errors[0].code == "coerce_enum"
+
+
+def test_coerce_enum_handles_none_and_non_string() -> None:
+    errors: list[TransformError] = []
+    assert coerce_enum(None, PRIORITY_VALID, PRIORITY_SYNONYMS, "p", errors) is None
+    assert coerce_enum(7, PRIORITY_VALID, PRIORITY_SYNONYMS, "p", errors) == 7
+    assert errors == []
+
+
+def test_map_payload_coerces_priority_synonym_when_enabled() -> None:
+    payload = {
+        "ticket_id": "TKT-1",
+        "customer_id": "CUST-1",
+        "created_at": "2025-01-01T00:00:00+00:00",
+        "language": "en",
+        "summary": "x",
+        "category": "billing",
+        "priority": "critical",
+        "entities": [],
+        "actions": [
+            {
+                "action": "triage",
+                "owner": "AG-1",
+                "due_at": "2025-01-02T00:00:00+00:00",
+            }
+        ],
+    }
+
+    mapped, errors = map_payload(payload, allow_coercion=True)
+    assert mapped["priority"] == "urgent"
+    assert any(error.code == "coerce_enum" for error in errors)
+
+
+def test_map_payload_leaves_priority_synonym_alone_when_disabled() -> None:
+    payload = {
+        "ticket_id": "TKT-1",
+        "customer_id": "CUST-1",
+        "created_at": "2025-01-01T00:00:00+00:00",
+        "language": "en",
+        "summary": "x",
+        "category": "billing",
+        "priority": "critical",
+        "entities": [],
+        "actions": [
+            {
+                "action": "triage",
+                "owner": "AG-1",
+                "due_at": "2025-01-02T00:00:00+00:00",
+            }
+        ],
+    }
+
+    mapped, errors = map_payload(payload, allow_coercion=False)
+    assert mapped["priority"] == "critical"
+    # No coercion warning was emitted.
+    assert not any(error.code == "coerce_enum" for error in errors)

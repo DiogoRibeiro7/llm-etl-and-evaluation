@@ -4,7 +4,16 @@ from __future__ import annotations
 
 from typing import Any
 
-from llm_etl_eval.transform.coerce import coerce_float, coerce_list, coerce_string
+from llm_etl_eval.transform.coerce import (
+    CATEGORY_SYNONYMS,
+    CATEGORY_VALID,
+    PRIORITY_SYNONYMS,
+    PRIORITY_VALID,
+    coerce_enum,
+    coerce_float,
+    coerce_list,
+    coerce_string,
+)
 from llm_etl_eval.transform.errors import TransformError
 
 REQUIRED_FIELDS = [
@@ -163,12 +172,26 @@ def map_payload(
             payload.get("summary"), "summary", errors, allow_coercion=allow_coercion
         )
         or "",
-        "category": coerce_string(
-            payload.get("category"), "category", errors, allow_coercion=allow_coercion
+        "category": coerce_enum(
+            coerce_string(
+                payload.get("category"), "category", errors, allow_coercion=allow_coercion
+            ),
+            CATEGORY_VALID,
+            CATEGORY_SYNONYMS,
+            "category",
+            errors,
+            allow_coercion=allow_coercion,
         )
         or "",
-        "priority": coerce_string(
-            payload.get("priority"), "priority", errors, allow_coercion=allow_coercion
+        "priority": coerce_enum(
+            coerce_string(
+                payload.get("priority"), "priority", errors, allow_coercion=allow_coercion
+            ),
+            PRIORITY_VALID,
+            PRIORITY_SYNONYMS,
+            "priority",
+            errors,
+            allow_coercion=allow_coercion,
         )
         or "",
         "entities": _map_entities(payload.get("entities"), errors, allow_coercion=allow_coercion),
